@@ -1,20 +1,18 @@
 "use client";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { SignUpForm } from "@/types/type";
 export default function Signup() {
   const router = useRouter();
-  type FormData = {
-    fullName: string;
-    email: string;
-    password: string;
-    confirmPassword: string;
-  };
-  const [formData, setFormData] = useState<FormData>({
+
+  const [formData, setFormData] = useState<SignUpForm>({
     fullName: "",
     email: "",
     password: "",
     confirmPassword: "",
   });
+
+  const [message, setMessage] = useState<string>("");
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -41,10 +39,14 @@ export default function Signup() {
     });
     if (!res) {
       console.log("no response from server");
+
       return;
     }
-
-    console.log(formData);
+    const data = await res.json();
+    if (data.message) {
+      setMessage(data.message);
+      return;
+    }
     router.push("/login");
   };
 

@@ -1,17 +1,16 @@
 "use client";
-import { error } from "console";
 import { useState } from "react";
-
+import { LogInForm } from "@/types/type";
+import { useRouter } from "next/navigation";
 export default function Login() {
-  type formType = {
-    email: string;
-    password: string;
-  };
-  const [formData, setFormData] = useState<formType>({
+  const router = useRouter();
+
+  const [formData, setFormData] = useState<LogInForm>({
     email: "",
     password: "",
   });
 
+  const [message, setMessage] = useState<string>("");
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     e.preventDefault();
 
@@ -35,10 +34,14 @@ export default function Login() {
     });
     if (!res) {
       console.log("error happent while login");
-      return;
     }
     const data = await res.json();
-    console.log("login succses : ", data);
+    if (data.message) {
+      setMessage(data.message);
+      return;
+    }
+    router.push("/dashboard");
+    localStorage.setItem("token", data.token);
   };
 
   return (
@@ -54,6 +57,11 @@ export default function Login() {
 
         <div className="bg-gray-800 py-8 px-6 shadow-lg rounded-lg border border-gray-700">
           <form className="space-y-6" onSubmit={handleSubmit}>
+            {message && (
+              <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative mb-4">
+                <span className="block sm:inline">{message}</span>
+              </div>
+            )}
             <div>
               <label
                 htmlFor="email"
